@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图片展示</title>
+</head>
+<body>
+    下面是要展示的图片<br/>
+    {% for item in imgs %}
+        <img src="{{ item.imageOri.url }}"><br/>
+        <!--<img src="/FaceDetandRec/media/imgOri">-->
+        <!--<a href="/FaceDetandRec/media/imgOri">。。。</a>-->
+    {% endfor %}
+</body>
+</html>
