@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="frame">
+    	<div class="page tlid-homepage homepage face-detect">
+    	     <div class="homepage-content-wrap">
+    	     	<div class="tlid-source-target main-header">
+    	     		<div class="source-target-row">
+						<div class="input">
+							<div class="tlid-input input has-detector">
+    	     				<div class="tlid-face-bar ls-wrap">
+			    	     		<div class="sl-wrap">
+									<a href="" class="sl-title">待检测图片</a>
+									<a href="" class="tl-title">图片检测结果</a>
+			    	     		</div>
+		    	     		</div>
+		    	     		<div class="source-wrap">
+		    	     			<div class="input-full-height-wrapper tlid-input-full-height-wrapper">
+		    	     				<div class="source-input">
+		    	     					<div class="tlid-input-area input-area less-padding" id="input-wrap">
+		    	     						<div class="uploadImg">
+										       <form action="" method="post" enctype="multipart/form-data">
+										            {% csrf_token %}
+										            <input type="file" name="imgOri">
+										            <input type="submit" value="上传">
+										        </form>
+										   </div>
+											<img src="{{ imgOri.imageOri.url }}"><br/>
+		    	     					</div>
+		    	     					<div class="source-header">
+		    	     						<div class="clear-wrap">
+		    	     							<div class="clear jfk-button-flat tlid-clear-source-text jfk-button" aria-label="清除图片" data-tooltip="清除图片" role="button" aria-hidden="false" data-tooltip-align="t,c" style="user-select: none;" tabindex="0">
+		    	     								<div class="jfk-button-img"></div>
+		    	     							</div>
+		    	     						</div>
+		    	     					</div>
+		    	     				</div>
+		    	     			</div>
+		    	     		</div>
+    	     			</div>
+						</div>
+    	     			<div class="tlid-results-container results-container">
+    	     				<div class="error-placeholder placeholder">
+    	     					<span class="tlid-result-error"></span>
+    	     					<span class="tlid-result-container-error-button translation-error-button">重试</span>
+    	     				</div>
+    	     				<span class="empty-placeholder placeholder">检测</span>
+    	     				<span class="detecting-placeholder placeholder">正在检测...</span>
+    	     				<div class="tlid-result result-dict-wrapper">
+    	     					<div class="result tlid-copy-target">
+    	     						<div class="result-header"></div>
+    	     						<div class="text-wrap tlid-copy-target">
+    	     							<div class="result-shield-container tlid-copy-target">
+    	     								<span class="tlid-detector detector">
+												{% for item in imgTars %}
+													<img src="{{ item.imageTar.url }}"><br/>
+												{% endfor %}
+    	     								</span>
+    	     							</div>
+    	     						</div>
+    	     					</div>
+    	     				</div>
+    	     			</div>
+    	     			<div class="tlid-result-view cllist empty">详细结果</div>
+    	     			<div class="other">其他</div>
+    	     		</div>
+    	     	</div>
+    	     </div>
+    	</div>
+    </div>
+{% endblock %}
+
+
+
+
+

@@ -9,6 +9,9 @@ __pycache__/
 #
 .idea
 
+#picture
+media/
+
 # Distribution / packaging
 .Python
 build/

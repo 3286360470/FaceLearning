@@ -1,0 +1,31 @@
+.history-frame {
+    color: #80868b;
+	font-size: 16px;
+	/*font-style: italic;*/
+	font-weight: 400;
+	text-decoration: none;
+	margin: 0 -80px;
+}
+
+.history-frame .page .main-header {
+	border-radius:8px;
+	width: 880px;
+}
+
+.history-frame .source-wrap .tlid-input-area {
+    position: relative;
+    margin: 50px 0;
+    padding-left: 6%;
+}
+
+.history-frame .history-page {
+    position: absolute;
+    background: #fff;
+    height: 100%;
+    width: 260px;
+    right: 0;
+    top: 1%;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    max-width: 460px;
+}
+

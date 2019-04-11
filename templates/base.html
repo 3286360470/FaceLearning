@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %} 人脸检测 {% endblock %} </title>
+        <link rel="stylesheet" href="/static/css/base.css" type="text/css" media="all" />
+        <link rel="stylesheet" href="/static/css/iconfont.css" type="text/css" media="all" />
+        <link rel="stylesheet" href="/static/css/home.css" type="text/css" media="all" />
+        <link rel="stylesheet" href="/static/css/history.css" type="text/css" media="all" />
+    </head>
+    <body>
+        <div class="pure-g" id="layout">
+            <div class="sidebar pure-u-1 pure-u-md-1-4">
+                <div class="header">
+                    <h1 class="brand-title"><a href="{% url 'home' %}"> 人脸检测 </a></h1>
+                    <h2 class="brand-tagline">昵称：{{ user.nickname }}</h2>
+                    <nav class="nav">
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/" class="btn btn-home"> 主页 </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="btn btn-man-face"> 人脸检测 </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="btn btn-others"> 其他 </a>
+                            </li>
+                        </ul>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="" class="btn btn-history"> 历史记录 </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+            <div class="pure-menu pure-menu-horizontal pure-menu-open">
+                <div class="footer">
+                    <div class="w">
+                        <div class="history" >
+                            <a href="./history.html" class="link-history">
+                                <i class="icon iconfont icon-history" aria-hidden="true"></i>
+                                <p> 历史记录 </p>
+                            </a>
+                        </div>
+                        <div class="links">
+                            <a href="https://www.baidu.com/" class="link"> 百度 </a>
+                            <a href="http://djangobook.py3k.cn/2.0/" class="link"> DjangoBook </a>
+                            <a href="http://dlib.net/" class="link"> Dlib </a>
+                            <a href="https://www.zhihu.com/" class="link"> 知乎 </a>
+                        </div>
+                        <p class="copyright">Copyright © 2019</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

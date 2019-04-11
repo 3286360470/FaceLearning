@@ -30,7 +30,7 @@ class OriPic(models.Model):
     update_time = models.DateField()
 
     def __str__(self):
-        return self.opid
+        return str(self.imageOri)
 
 #目标图片：编号，图片内容，名称，状态，创建时间，更新时间
 class TarPic(models.Model):
@@ -42,7 +42,7 @@ class TarPic(models.Model):
     update_time = models.DateField()
 
     def __str__(self):
-        return self.opid
+        return str(self.imageTar)
 
 #历史记录列表：编号，记录中的任务数，关联的用户，关联的原始图片和目标图片，创建时间，更新时间
 class Record(models.Model):

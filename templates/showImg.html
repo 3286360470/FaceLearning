@@ -1,17 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>图片展示</title>
-</head>
-<body>
-    下面是要展示的图片<br/>
-    <!--{% for item in imgs %}-->
-        <!--<img src="{{ item.imageOri.url }}"><br/>-->
-        <!--&lt;!&ndash;<img src="/FaceDetandRec/media/imgOri">&ndash;&gt;-->
-        <!--&lt;!&ndash;<a href="/FaceDetandRec/media/imgOri">。。。</a>&ndash;&gt;-->
-    <!--{% endfor %}-->
-    <img src="{{ img.imageTar.url }}"><br/>
-    <!--<img src="testImg.url"><br/>-->
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="show-image">
+        下面是要展示的图片<br/>
+        <!--{% for item in imgOris %}-->
+            <!--<img src="{{ item.imageOri.url }}"><br/>-->
+            <!--&lt;!&ndash;<img src="/FaceDetandRec/media/imgOri">&ndash;&gt;-->
+            <!--&lt;!&ndash;<a href="/FaceDetandRec/media/imgOri">。。。</a>&ndash;&gt;-->
+        <!--{% endfor %}-->
+        <img src="{{ imgOri.imageOri.url }}"><br/>
+        {% for item in imgTars %}
+            <img src="{{ item.imageTar.url }}"><br/>
+        {% endfor %}
+        <!--<img src="testImg.url"><br/>-->
+    </div>
+{% endblock %}
+
+

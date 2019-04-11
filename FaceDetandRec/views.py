@@ -7,12 +7,57 @@ import datetime
 import numpy as np
 import cv2
 import dlib
-import sys
 
 # Create your views here.
 def home(request):
+    imgOri = models.OriPic.objects.get(opid='2')
+    imageTar = 'imgTar/' + str(imgOri.imageOri).split('/')[1]
+    imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
+    print(imgTar)
+    if not imgTar:
+        tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
+        process(str(imgOri.imageOri))
+        imgTar = models.TarPic(
+            imageTar=imageTar,
+            tpname=tpname,
+            tpstate=1,
+            create_time=datetime.datetime.now(),
+            update_time=datetime.datetime.now(),
+        )
+        imgTar.save()
+        imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
+        print(imgTar)
+    print(imgTar)
+    context = {
+        'imgOri': imgOri,
+        'imgTars': imgTar,
+    }
+    return render(request, 'home.html', context)
 
-    pass
+def history(request):
+    imgOri = models.OriPic.objects.get(opid='2')
+    imageTar = 'imgTar/' + str(imgOri.imageOri).split('/')[1]
+    imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
+    print(imgTar)
+    if not imgTar:
+        tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
+        process(str(imgOri.imageOri))
+        imgTar = models.TarPic(
+            imageTar=imageTar,
+            tpname=tpname,
+            tpstate=1,
+            create_time=datetime.datetime.now(),
+            update_time=datetime.datetime.now(),
+        )
+        imgTar.save()
+        imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
+        print(imgTar)
+    print(imgTar)
+    context = {
+        'imgOri': imgOri,
+        'imgTars': imgTar,
+    }
+    return render(request, 'history.html', context)
 
 def uploadImg(request):
     if request.method == 'POST':
@@ -27,14 +72,27 @@ def uploadImg(request):
     return render(request, 'imgUpload.html')
 
 def showImg(request):
-    imgOri = models.OriPic.objects.get(opid='2')
-    imageTar = request.FILES.get('imgTar')
-    tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
-    imgTar = process(str(imgOri.imageOri), imageTar, tpname)
-    # testImg = test()
+    imgOri = models.OriPic.objects.get(opid='6')
+    imageTar = 'imgTar/' + str(imgOri.imageOri).split('/')[1]
+    imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
+    print(imgTar)
+    if not imgTar:
+        tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
+        process(str(imgOri.imageOri))
+        imgTar = models.TarPic(
+            imageTar=imageTar,
+            tpname=tpname,
+            tpstate=1,
+            create_time=datetime.datetime.now(),
+            update_time=datetime.datetime.now(),
+        )
+        imgTar.save()
+        imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
+        print(imgTar)
+    print(imgTar)
     context = {
-        'img':imgTar,
-        # 'test': testImg
+        'imgOri':imgOri,
+        'imgTars':imgTar,
     }
     return render(request, 'showImg.html', context)
 
@@ -109,7 +167,7 @@ def shape_to_np(shape, dtype="int"):
 
     return coords
 
-def resize(image, width=1200):
+def resize(image, width):
     '''
     调整带检测的图片的大小
     :param image: 读入的图片
@@ -121,11 +179,10 @@ def resize(image, width=1200):
     resized = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
     return resized
 
-def process(imgOri, imageTar, tpname):
+def process(imgOri):
     image_file = './media/'+imgOri
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-    # t = cv2.getTickCount()
     image = cv2.imread(image_file)
     image = resize(image, width=1200)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -143,15 +200,5 @@ def process(imgOri, imageTar, tpname):
         # 标识出人脸区域的68个点
         for (x, y) in shape:
             cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
+    image = resize(image, width=400)
     cv2.imwrite("media/imgTar/" + imgOri.split('/')[1], img=image)
-    imgTar = models.TarPic(
-        imageTar='imgTar/'+imgOri.split('/')[1],
-        tpname=tpname,
-        tpstate=1,
-        create_time=datetime.datetime.now(),
-        update_time=datetime.datetime.now(),
-    )
-    imgTar.save()
-    return imgTar
-
-git@github.com:3286360470/FaceLearning.git

@@ -1,14 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>图片上传</title>
-</head>
-<body>
-    <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="file" name="imgOri">
-        <input type="submit" value="上传">
-    </form>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+   <div class="uploadImg">
+       <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="imgOri">
+            <input type="submit" value="上传">
+        </form>
+   </div>
+{% endblock %}
+
+
