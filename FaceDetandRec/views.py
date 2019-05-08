@@ -9,58 +9,19 @@ import cv2
 import dlib
 
 # Create your views here.
+'''
+需要增加判断，防止数据库为空时，造成数据查询异常
+此处需要添加当本地的用户的缓存信息清除之后需要用户重新登录
+'''
 def home(request):
-    imgOri = models.OriPic.objects.get(opid='2')
-    imageTar = 'imgTar/' + str(imgOri.imageOri).split('/')[1]
-    imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
-    print(imgTar)
-    if not imgTar:
-        tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
-        process(str(imgOri.imageOri))
-        imgTar = models.TarPic(
-            imageTar=imageTar,
-            tpname=tpname,
-            tpstate=1,
-            create_time=datetime.datetime.now(),
-            update_time=datetime.datetime.now(),
-        )
-        imgTar.save()
-        imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
-        print(imgTar)
-    print(imgTar)
-    context = {
-        'imgOri': imgOri,
-        'imgTars': imgTar,
-    }
-    return render(request, 'home.html', context)
-
-def history(request):
-    imgOri = models.OriPic.objects.get(opid='2')
-    imageTar = 'imgTar/' + str(imgOri.imageOri).split('/')[1]
-    imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
-    print(imgTar)
-    if not imgTar:
-        tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
-        process(str(imgOri.imageOri))
-        imgTar = models.TarPic(
-            imageTar=imageTar,
-            tpname=tpname,
-            tpstate=1,
-            create_time=datetime.datetime.now(),
-            update_time=datetime.datetime.now(),
-        )
-        imgTar.save()
-        imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
-        print(imgTar)
-    print(imgTar)
-    context = {
-        'imgOri': imgOri,
-        'imgTars': imgTar,
-    }
-    return render(request, 'history.html', context)
-
-def uploadImg(request):
-    if request.method == 'POST':
+    img, imgTar = None, None
+    if request.method == 'GET':
+        # opid = 1
+        opid = request.GET.get('opid')
+        tpid = opid
+        if opid is not None and tpid is not None:
+            img, imgTar = models.OriPic.objects.get(opid=str(opid)), models.TarPic.objects.get(tpid=str(tpid))
+    elif request.method == 'POST':
         img = models.OriPic(
             imageOri=request.FILES.get('imgOri'),
             opname=str(request.user)+str(datetime.datetime.now())+'.jpg',
@@ -69,13 +30,108 @@ def uploadImg(request):
             update_time=datetime.datetime.now(),
         )
         img.save()
+        imageTar = 'imgTar/' + str(img.imageOri).split('/')[1]
+        imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
+        print(imgTar)
+        if not imgTar:
+            tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
+            process(str(img.imageOri))
+            imgTar = models.TarPic(
+                imageTar=imageTar,
+                tpname=tpname,
+                tpstate=1,
+                create_time=datetime.datetime.now(),
+                update_time=datetime.datetime.now(),
+            )
+            imgTar.save()
+            record = models.Record.objects.create(
+                amount=1,
+                users_id=request.user.id,
+                create_time=datetime.datetime.now(),
+                update_time=datetime.datetime.now(),
+            )
+            record.oripics.add(img)
+            record.tarpics.add(imgTar)
+    context = {
+        'imgOri': img,
+        'imgTar': imgTar,
+        'user'  : request.user,
+        # 'users'  : 'Hello kitty',#request.user,
+    }
+    print('test')
+    print(str(request.user.username))
+    print('test\n\n\n')
+    return render(request, 'home.html', context)
+
+'''
+后期改进建议：
+对于历史记录页面，需要和home页面一样，能够具有上传图片并进行检测的功能
+'''
+def history(request):
+    imgOris, imgTars, imgs, record, test = [], [], [], [], [1, 2, 3]
+    # if request.method == 'POST':
+    userId = request.user.id
+    record = models.Record.objects.filter(users_id__exact=userId)
+    if record:
+        # record = models.Record.objects.get(users_id=userId)
+        for i in range(len(record)):
+            imgOris.append(record[i].oripics.first())
+            imgTars.append(record[i].tarpics.first())
+    context = {
+        'imgOris': imgOris,
+        'imgTars': imgTars,
+        'user'   : request.user,
+    }
+
+    return render(request, 'history.html', context)
+
+'''
+在上传图片的时候，当上传完成之后，则可以直接将检测出的图片显示出来，
+不需要在通过到showImg.html页面查看最终检测出来的图片，此操作是为了
+实现源图片和目标图片的原子操作，从而使得源图片和目标图片是一一对应的，
+而不会出现只有源图片，找不到对应的目标图片。
+'''
+def uploadImg(request):
+    if request.method == 'POST':
+        try:
+            img = models.OriPic(
+                imageOri=request.FILES.get('imgOri'),
+                opname=str(request.user)+str(datetime.datetime.now())+'.jpg',
+                opstate=1,
+                create_time=datetime.datetime.now(),
+                update_time=datetime.datetime.now(),
+            )
+            img.save()
+            imageTar = 'imgTar/' + str(img.imageOri).split('/')[1]
+            imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
+            if not imgTar:
+                tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
+                process(str(img.imageOri))
+                imgTar = models.TarPic(
+                    imageTar=imageTar,
+                    tpname=tpname,
+                    tpstate=1,
+                    create_time=datetime.datetime.now(),
+                    update_time=datetime.datetime.now(),
+                )
+                imgTar.save()
+                record = models.Record.objects.create(
+                    amount=1,
+                    users_id=request.user.id,
+                    create_time=datetime.datetime.now(),
+                    update_time=datetime.datetime.now(),
+                )
+                record.oripics.add(img)
+                record.tarpics.add(imgTar)
+        except Exception as result:
+            print('未知错误 %s'%result)
+
     return render(request, 'imgUpload.html')
 
 def showImg(request):
-    imgOri = models.OriPic.objects.get(opid='6')
+    imgOri = models.OriPic.objects.get(opid='0')
     imageTar = 'imgTar/' + str(imgOri.imageOri).split('/')[1]
     imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
-    print(imgTar)
     if not imgTar:
         tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
         process(str(imgOri.imageOri))
@@ -87,12 +143,28 @@ def showImg(request):
             update_time=datetime.datetime.now(),
         )
         imgTar.save()
-        imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
-        print(imgTar)
-    print(imgTar)
+        record = models.Record(
+            amount=1,
+            users_id=0,
+            oripics=imgOri,
+            tarpics=imgTar,
+            create_time=datetime.datetime.now(),
+            update_time=datetime.datetime.now(),
+        )
+        record.save()
+    record = models.Record.objects.create(
+        amount=1,
+        users_id=1,
+        create_time=datetime.datetime.now(),
+        update_time=datetime.datetime.now(),
+    )
+    record.oripics.add(imgOri)
+    for item in imgTar:
+        record.tarpics.add(item)
     context = {
-        'imgOri':imgOri,
-        'imgTars':imgTar,
+        'imgOri'  : imgOri,
+        'imgTars' : imgTar,
+        'user'    : request.user,
     }
     return render(request, 'showImg.html', context)
 
@@ -142,6 +214,9 @@ def index(request):
 #     img = Image.open("./zhexian.jpg")
 #     return img
 
+'''
+人脸检测算法实现
+'''
 def rect_to_bb(rect):
     '''
     对已经检测到的脸部区域进行数据加工
@@ -202,3 +277,5 @@ def process(imgOri):
             cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
     image = resize(image, width=400)
     cv2.imwrite("media/imgTar/" + imgOri.split('/')[1], img=image)
+
+

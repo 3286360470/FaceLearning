@@ -1,3 +1,8 @@
+tree.txt
+templates/receiver.html
+tempates/test.html
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -52,9 +52,9 @@
     	     						<div class="text-wrap tlid-copy-target">
     	     							<div class="result-shield-container tlid-copy-target">
     	     								<span class="tlid-detector detector">
-												{% for item in imgTars %}
-													<img src="{{ item.imageTar.url }}"><br/>
-												{% endfor %}
+												<!--{% for item in imgTars %}-->
+													<!--<img src="{{ item.imageTar.url }}"><br/>-->
+												<!--{% endfor %}-->
     	     								</span>
     	     							</div>
     	     						</div>
@@ -71,10 +71,35 @@
             <div class="outer-wrap">
                 <div class="tlid-history-container history-container">
                     <div class="history-top-header">
-                        历史记录头部信息
+						<div class="history-top-bar">
+							<div class="tlid-history-close-button">
+								<span class="gt-con"></span>
+							</div>
+							<div class="title">历史记录</div>
+						</div>
                     </div>
                     <div class="history-body">
-                        历史记录记录内容
+                        <div class="tlid-history-entry-list" role="listbox">
+							{% for item in imgOris %}
+								<div class="tlid-history-entry" role="option">
+									<div class="tlid-browse-entry browse-entry" role="button" tabindex="0">
+										<form method="get" action="./home" class="history-option" name="originalPic" onsubmit="return foo()" style="position:relative">
+											<input type="hidden" name="opid" value="{{ item.opid }}" index="{{ item.opid }}" >
+											<div class="group">
+												<!--<div class="imgs">-->
+												<img src="{{ item.imageOri.url }}" class="history-item" width="100" height="100">
+												<!--</div>-->
+												<div class="descript">
+													<span> {{ item.opname }} </span>
+													<span> {{ item.update_time }} </span>
+												</div>
+											</div>
+											<input type="submit" style="position:absolute;left:0px;top:0px;width:120px;height:120px;opacity:0;cursor:pointer"/>
+										</form>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
                     </div>
                     <div class="empty-placeholder"></div>
                     <div class="history-loader"></div>
@@ -84,7 +109,12 @@
     </div>
 {% endblock %}
 
-
-
+<script>
+    function foo(){
+        var originalPic = window.event.srcElement;
+        originalPic.opid.value = $(originalPic.opid).attr("index");
+        return true;
+    }
+</script>
 
 

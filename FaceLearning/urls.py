@@ -34,6 +34,8 @@ urlpatterns = [
     # url(r'^animal/$', views.animals, name='animals'),
     # url(r'^others/$', views.others, name='others'),
     url(r'^history/$', views.history, name='history'),
+    url(r'^history/home.*$', views.home, name='home'),
+    # url(r'^history/history.*/$', views.home, name='home'),
     #图片管理
     url(r'^uploadImg/$', views.uploadImg, name='uploadImg'),
     url(r'^showImg/$', views.showImg, name='showImg'),
