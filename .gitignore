@@ -1,7 +1,8 @@
 tree.txt
 templates/receiver.html
 tempates/test.html
-
+shape_predictor_68_face_landmarks.dat
+FaceDetandRec/shape_predictor_68_face_landmarks.dat
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
