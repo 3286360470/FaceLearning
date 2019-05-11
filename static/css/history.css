@@ -29,3 +29,12 @@
     max-width: 460px;
 }
 
+.history-frame .history-body .group{
+    vertical-align: middle;
+}
+.history-frame .history-body .group .descript {
+    width: 150px;
+    display: inline-block;
+}
+
+
