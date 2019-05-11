@@ -18,18 +18,18 @@
                     <nav class="nav">
                         <ul class="nav-list">
                             <li class="nav-item">
-                                <a href="/" class="btn btn-home"> 主页 </a>
+                                <a href="{% url 'index' %}" class="btn btn-home"> 主页 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="" class="btn btn-man-face"> 人脸检测 </a>
+                                <a href="/" class="btn btn-man-face"> 人脸检测 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="" class="btn btn-others"> 其他 </a>
+                                <a href="/" class="btn btn-others"> 其他 </a>
                             </li>
                         </ul>
                         <ul class="nav-list">
                             <li class="nav-item">
-                                <a href="" class="btn btn-history"> 历史记录 </a>
+                                <a href="{% url 'history' %}" class="btn btn-history"> 历史记录 </a>
                             </li>
                         </ul>
                     </nav>
