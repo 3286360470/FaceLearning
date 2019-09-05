@@ -113,3 +113,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+FaceDetandRec/mmod_human_face_detector.dat
+face_image/
+mmod_human_face_detector.dat
