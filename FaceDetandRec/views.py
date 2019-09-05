@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from PIL import Image
+from django.db import transaction
 from FaceDetandRec import models
 from .forms import RegisterForm
 import datetime
@@ -13,6 +13,7 @@ import dlib
 需要增加判断，防止数据库为空时，造成数据查询异常
 此处需要添加当本地的用户的缓存信息清除之后需要用户重新登录
 '''
+# @transaction.Atomic
 def home(request):
     img, imgTar = None, None
     if request.method == 'GET':
@@ -22,45 +23,46 @@ def home(request):
         if opid is not None and tpid is not None:
             img, imgTar = models.OriPic.objects.get(opid=str(opid)), models.TarPic.objects.get(tpid=str(tpid))
     elif request.method == 'POST':
-        img = models.OriPic(
-            imageOri=request.FILES.get('imgOri'),
-            opname=str(request.user)+str(datetime.datetime.now())+'.jpg',
-            opstate=1,
-            create_time=datetime.datetime.now(),
-            update_time=datetime.datetime.now(),
-        )
-        img.save()
-        imageTar = 'imgTar/' + str(img.imageOri).split('/')[1]
-        imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
-        print(imgTar)
-        if not imgTar:
-            tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
-            process(str(img.imageOri))
-            imgTar = models.TarPic(
-                imageTar=imageTar,
-                tpname=tpname,
-                tpstate=1,
+        with transaction.atomic():
+            img = models.OriPic(
+                imageOri=request.FILES.get('imgOri'),
+                opname=str(request.user)+str(datetime.datetime.now())+'.jpg',
+                opstate=1,
                 create_time=datetime.datetime.now(),
                 update_time=datetime.datetime.now(),
             )
-            imgTar.save()
-            record = models.Record.objects.create(
-                amount=1,
-                users_id=request.user.id,
-                create_time=datetime.datetime.now(),
-                update_time=datetime.datetime.now(),
-            )
-            record.oripics.add(img)
-            record.tarpics.add(imgTar)
+            img.save()
+            imageTar = 'imgTar/' + str(img.imageOri).split('/')[1]
+            imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
+            print(imgTar)
+            if not imgTar:
+                tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
+                process(str(img.imageOri))
+                imgTar = models.TarPic(
+                    imageTar=imageTar,
+                    tpname=tpname,
+                    tpstate=1,
+                    create_time=datetime.datetime.now(),
+                    update_time=datetime.datetime.now(),
+                )
+                imgTar.save()
+                record = models.Record.objects.create(
+                    amount=1,
+                    users_id=request.user.id,
+                    create_time=datetime.datetime.now(),
+                    update_time=datetime.datetime.now(),
+                )
+                record.oripics.add(img)
+                record.tarpics.add(imgTar)
     context = {
         'imgOri': img,
         'imgTar': imgTar,
         'user'  : request.user,
         # 'users'  : 'Hello kitty',#request.user,
     }
-    print('test')
-    print(str(request.user.username))
-    print('test\n\n\n')
+    # print('test')
+    # print(str(request.user.username))
+    # print('test\n\n\n')
     return render(request, 'home.html', context)
 
 '''
@@ -93,7 +95,7 @@ def history(request):
 '''
 def uploadImg(request):
     if request.method == 'POST':
-        try:
+        with transaction.atomic():
             img = models.OriPic(
                 imageOri=request.FILES.get('imgOri'),
                 opname=str(request.user)+str(datetime.datetime.now())+'.jpg',
@@ -123,8 +125,6 @@ def uploadImg(request):
                 )
                 record.oripics.add(img)
                 record.tarpics.add(imgTar)
-        except Exception as result:
-            print('未知错误 %s'%result)
 
     return render(request, 'imgUpload.html')
 
@@ -132,35 +132,36 @@ def showImg(request):
     imgOri = models.OriPic.objects.get(opid='0')
     imageTar = 'imgTar/' + str(imgOri.imageOri).split('/')[1]
     imgTar = models.TarPic.objects.filter(imageTar__exact=imageTar)
-    if not imgTar:
-        tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
-        process(str(imgOri.imageOri))
-        imgTar = models.TarPic(
-            imageTar=imageTar,
-            tpname=tpname,
-            tpstate=1,
-            create_time=datetime.datetime.now(),
-            update_time=datetime.datetime.now(),
-        )
-        imgTar.save()
-        record = models.Record(
+    with transaction.atomic():
+        if not imgTar:
+            tpname = str(request.user) + str(datetime.datetime.now()) + '.jpg'
+            process(str(imgOri.imageOri))
+            imgTar = models.TarPic(
+                imageTar=imageTar,
+                tpname=tpname,
+                tpstate=1,
+                create_time=datetime.datetime.now(),
+                update_time=datetime.datetime.now(),
+            )
+            imgTar.save()
+            record = models.Record(
+                amount=1,
+                users_id=0,
+                oripics=imgOri,
+                tarpics=imgTar,
+                create_time=datetime.datetime.now(),
+                update_time=datetime.datetime.now(),
+            )
+            record.save()
+        record = models.Record.objects.create(
             amount=1,
-            users_id=0,
-            oripics=imgOri,
-            tarpics=imgTar,
+            users_id=1,
             create_time=datetime.datetime.now(),
             update_time=datetime.datetime.now(),
         )
-        record.save()
-    record = models.Record.objects.create(
-        amount=1,
-        users_id=1,
-        create_time=datetime.datetime.now(),
-        update_time=datetime.datetime.now(),
-    )
-    record.oripics.add(imgOri)
-    for item in imgTar:
-        record.tarpics.add(item)
+        record.oripics.add(imgOri)
+        for item in imgTar:
+            record.tarpics.add(item)
     context = {
         'imgOri'  : imgOri,
         'imgTars' : imgTar,
@@ -213,7 +214,7 @@ def index(request):
 # def test():
 #     img = Image.open("./zhexian.jpg")
 #     return img
-
+#
 '''
 人脸检测算法实现
 '''
@@ -277,5 +278,3 @@ def process(imgOri):
             cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
     image = resize(image, width=400)
     cv2.imwrite("media/imgTar/" + imgOri.split('/')[1], img=image)
-
-
