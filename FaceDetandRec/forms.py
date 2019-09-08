@@ -7,3 +7,7 @@ class RegisterForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ("username", "email", "nickname")
+
+
+
+
